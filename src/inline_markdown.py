@@ -7,7 +7,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         else:
             split = node.text.split(delimiter)
             if len(split)%2 == 0:
-                raise Exception("No closing delimeter")
+                raise ValueError("No closing delimeter")
             for index,value in enumerate(split):
                 if index %2 !=0:
                     new_nodes.append(TextNode(value,text_type))

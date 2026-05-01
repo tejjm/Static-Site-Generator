@@ -104,3 +104,35 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(html_node.tag, "a")
         self.assertEqual(html_node.value, "This is a link")
         self.assertEqual(html_node.props,{"href":"www.boot.dev"})
+
+    def test_split_code_delimeter(self):
+        node = TextNode("This is text with a `code block` word", TextType.TEXT)
+        expected = [TextNode("This is text with a ", TextType.TEXT),
+                  TextNode("code block", TextType.CODE),
+                  TextNode(" word", TextType.TEXT),]
+        self.assertEqual(split_nodes_delimiter([node], "`", TextType.CODE),expected)
+
+        
+    def test_split_bold_delimeter(self):
+        node = TextNode("This is a text with a **bold words right here,**which ended now",TextType.TEXT)
+        expected = [TextNode("This is a text with a ",TextType.TEXT),
+                    TextNode("bold words right here,",TextType.BOLD),
+                    TextNode("which ended now",TextType.TEXT),]
+        self.assertEqual(split_nodes_delimiter([node],"**",TextType.BOLD),expected)
+        
+    def test_split_code_italic_delimeter(self):
+        node = TextNode("This is a text with a _italic words right here,_which ended now",TextType.TEXT)
+        expected = [TextNode("This is a text with a ",TextType.TEXT),
+                    TextNode("italic words right here,",TextType.ITALIC),
+                    TextNode("which ended now",TextType.TEXT),]
+        self.assertEqual(split_nodes_delimiter([node],"_",TextType.ITALIC),expected)
+
+    def test_split_code_inavlid(self):
+        node = TextNode("This is a text with a _italic words right here,which ended now",TextType.TEXT)
+        with self.assertRaises(ValueError):
+            split_nodes_delimiter([node],"_",TextType.ITALIC)
+
+    def test_split_code_non_text(self):
+        node = TextNode("_This is a text with a italic words right here,which ended now_",TextType.ITALIC)
+        expected = [TextNode("_This is a text with a italic words right here,which ended now_",TextType.ITALIC)]
+        self.assertEqual(split_nodes_delimiter([node],"_",TextType.ITALIC),expected)
