@@ -43,18 +43,31 @@ def split_nodes_image(old_nodes):
                     remaining = after
                 if remaining != "":
                     split_nodes.append(TextNode(remaining,TextType.TEXT))
+    return split_nodes
 
 
 
 
-
-
-
-
-
-
-def split_nodes_link(old_image):
-    pass
-
+def split_nodes_link(old_nodes):
+    split_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            split_nodes.append(node)
+        else:
+            links = extract_markdown_links(node.text)
+            link_delims = [f"[{link[0]}]({link[1]})" for link in links]
+            if links == []:
+                split_nodes.append(TextNode(node.text,TextType.TEXT))     
+            else:
+                remaining = node.text
+                for delim, (alt,link) in zip(link_delims,links):
+                    before,after = remaining.split(delim,1)
+                    if before != "":
+                        split_nodes.append(TextNode(before,TextType.TEXT))
+                    split_nodes.append(TextNode(alt,TextType.LINK,link))
+                    remaining = after
+                if remaining != "":
+                    split_nodes.append(TextNode(remaining,TextType.TEXT))
+    return split_nodes
 
 
